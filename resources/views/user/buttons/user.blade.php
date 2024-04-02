@@ -65,10 +65,44 @@
                     </form>
                 @endif
             </li>
-            <li class="nav-tabV2">
-                <button class="nav-tab__link" data-toggle="modal" data-target="#modal_user_report">
+            <li class="nav-tabV2" x-data="dialog">
+                <button class="nav-tab__link" x-bind="showDialog">
                     {{ __('user.report') }}
                 </button>
+                <dialog class="dialog" x-bind="dialogElement">
+                    <h3 class="dialog__heading">Report user: {{ $user->username }}</h3>
+                    <form
+                        class="dialog__form"
+                        method="POST"
+                        action="{{ route('report_user', ['username' => $user->username]) }}"
+                        x-bind="dialogForm"
+                    >
+                        @csrf
+                        <p class="form__group">
+                            <textarea
+                                id="report_reason"
+                                class="form__textarea"
+                                name="message"
+                                required
+                            ></textarea>
+                            <label class="form__label form__label--floating" for="report_reason">
+                                Reason
+                            </label>
+                        </p>
+                        <p class="form__group">
+                            <button class="form__button form__button--filled">
+                                {{ __('common.save') }}
+                            </button>
+                            <button
+                                formmethod="dialog"
+                                formnovalidate
+                                class="form__button form__button--outlined"
+                            >
+                                {{ __('common.cancel') }}
+                            </button>
+                        </p>
+                    </form>
+                </dialog>
             </li>
         @endif
     </ul>
@@ -256,13 +290,56 @@
                         {{ __('staff.flush-ghost-peers') }}
                     </button>
                 </form>
-                <li class="nav-tabV2">
-                    <a
-                        class="nav-tab__link"
-                        href="{{ route('users.torrent_zip.show', ['user' => $user]) }}"
-                    >
-                        {{ __('torrent.download-all') }}
-                    </a>
+                <li class="nav-tabV2" x-data="dialog">
+                    <a class="nav-tab__link" x-bind="showDialog">Download Torrent Files</a>
+
+                    <dialog class="dialog" x-bind="dialogElement">
+                        <h3 class="dialog__heading">Download Torrent Files</h3>
+                        <form
+                            class="dialog__form"
+                            action="{{ route('users.torrent_zip.show', ['user' => $user]) }}"
+                            x-bind="dialogForm"
+                        >
+                            <fieldset>
+                                <legend>Select download type:</legend>
+
+                                <div>
+                                    <input
+                                        class="form__radio"
+                                        type="radio"
+                                        id="history"
+                                        name="type"
+                                        value="false"
+                                        checked
+                                    />
+                                    <label for="history">All History</label>
+                                </div>
+
+                                <div>
+                                    <input
+                                        class="form__radio"
+                                        type="radio"
+                                        id="peer"
+                                        name="type"
+                                        value="true"
+                                    />
+                                    <label for="peer">Active Peers</label>
+                                </div>
+                            </fieldset>
+                            <p class="form__group">
+                                <button class="form__button form__button--filled">
+                                    {{ __('common.download') }}
+                                </button>
+                                <button
+                                    formmethod="dialog"
+                                    formnovalidate
+                                    class="form__button form__button--outlined"
+                                >
+                                    {{ __('common.cancel') }}
+                                </button>
+                            </p>
+                        </form>
+                    </dialog>
                 </li>
             @endif
         </ul>
@@ -358,7 +435,7 @@
 @if ($isProfileOwner || $isModo)
     <li class="nav-tab-menu">
         <a
-            class="{{ Route::is('users.earnings.index', 'users.transactions.create', 'users.gifts.index', 'users.gifts.create', 'users.tips.index') ? 'nav-tab--active__link' : 'nav-tab__link' }}"
+            class="{{ Route::is('users.earnings.index', 'users.transactions.create', 'users.gifts.index', 'users.gifts.create', 'users.post_tips.index', 'users.torrent_tips.index') ? 'nav-tab--active__link' : 'nav-tab__link' }}"
             href="{{ route('users.earnings.index', ['user' => $user]) }}"
         >
             {{ __('bon.bonus') }} {{ __('bon.points') }}
@@ -393,12 +470,22 @@
                     {{ __('bon.gifts') }}
                 </a>
             </li>
-            <li class="{{ Route::is('users.tips.index') ? 'nav-tab--active' : 'nav-tavV2' }}">
+            <li class="{{ Route::is('users.post_tips.index') ? 'nav-tab--active' : 'nav-tavV2' }}">
                 <a
-                    class="{{ Route::is('users.tips.index') ? 'nav-tab--active__link' : 'nav-tab__link' }}"
-                    href="{{ route('users.tips.index', ['user' => $user]) }}"
+                    class="{{ Route::is('users.post_tips.index') ? 'nav-tab--active__link' : 'nav-tab__link' }}"
+                    href="{{ route('users.post_tips.index', ['user' => $user]) }}"
                 >
-                    {{ __('bon.tips') }}
+                    {{ __('forum.post') }} {{ __('bon.tips') }}
+                </a>
+            </li>
+            <li
+                class="{{ Route::is('users.torrent_tips.index') ? 'nav-tab--active' : 'nav-tavV2' }}"
+            >
+                <a
+                    class="{{ Route::is('users.torrent_tips.index') ? 'nav-tab--active__link' : 'nav-tab__link' }}"
+                    href="{{ route('users.torrent_tips.index', ['user' => $user]) }}"
+                >
+                    {{ __('torrent.torrent') }} {{ __('bon.tips') }}
                 </a>
             </li>
         </ul>

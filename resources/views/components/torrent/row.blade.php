@@ -141,7 +141,7 @@
                 </a>
             @endif
 
-            @livewire('small-bookmark-button', ['torrent' => $torrent, 'isBookmarked' => $torrent->bookmarks_exists, 'user' => auth()->user()], key('torrent-'.$torrent->id))
+            {{-- @livewire('small-bookmark-button', ['torrent' => $torrent, 'isBookmarked' => $torrent->bookmarks_exists, 'user' => auth()->user()], key('torrent-'.$torrent->id)) --}}
 
             @if (config('torrent.download_check_page'))
                 <a
@@ -174,7 +174,9 @@
     </td>
 
     @if ($torrent->category->game_meta)
-        <td class="torrent-search--list__rating {{ rating_color($meta->rating) ?? 'text-white' }}">
+        <td
+            class="torrent-search--list__rating {{ rating_color($meta->rating ?? 0) ?? 'text-white' }}"
+        >
             <span>{{ round($meta->rating ?? 0) }}%</span>
         </td>
     @elseif ($torrent->category->movie_meta || $torrent->category->tv_meta)
@@ -191,12 +193,12 @@
     </td>
     <td class="torrent-search--list__seeders">
         <a href="{{ route('peers', ['id' => $torrent->id]) }}">
-            <span>{{ $torrent->seeders }}</span>
+            <span>{{ $torrent->seeds_count ?? $torrent->seeders }}</span>
         </a>
     </td>
     <td class="torrent-search--list__leechers">
         <a href="{{ route('peers', ['id' => $torrent->id]) }}">
-            <span>{{ $torrent->leechers }}</span>
+            <span>{{ $torrent->leeches_count ?? $torrent->leechers }}</span>
         </a>
     </td>
     <td class="torrent-search--list__completed">
